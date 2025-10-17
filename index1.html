@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Bookstore</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .logo span {
+            color: var(--secondary);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: var(--secondary);
+        }
+        
+        .auth-buttons button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-left: 0.5rem;
+            transition: background-color 0.3s;
+        }
+        
+        .auth-buttons button:hover {
+            background-color: #2980b9;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin: 2rem 0;
+            color: var(--dark);
+        }
+        
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .book-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .book-image {
+            height: 200px;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            font-weight: bold;
+        }
+        
+        .book-details {
+            padding: 1.5rem;
+        }
+        
+        .book-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .book-author {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .book-category {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .borrow-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .borrow-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .borrow-btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+        
+        .submit-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .form-footer a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Admin Panel Styles */
+        .admin-panel {
+            display: none;
+            padding: 2rem 0;
+        }
+        
+        .admin-nav {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .admin-nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        .admin-nav ul li {
+            margin-right: 1.5rem;
+        }
+        
+        .admin-nav ul li a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .admin-nav ul li a.active {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .admin-nav ul li a:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+        
+        .admin-section {
+            display: none;
+        }
+        
+        .admin-section.active {
+            display: block;
+        }
+        
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .admin-table th, .admin-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .admin-table th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .admin-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-right: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .edit-btn {
+            color: var(--secondary);
+        }
+        
+        .delete-btn {
+            color: var(--accent);
+        }
+        
+        .add-book-form {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        /* Student ID Form */
+        .student-id-form {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .student-info {
+            background-color: #e8f4fc;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        /* Penalty Info */
+        .penalty-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+            
+            .auth-buttons {
+                margin-top: 1rem;
+            }
+            
+            .books-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .admin-nav ul {
+                flex-direction: column;
+            }
+            
+            .admin-nav ul li {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">Uni<span>Bookstore</span></div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="nav-link" data-page="home">Home</a></li>
+                    <li><a href="#" class="nav-link" data-page="books">Books</a></li>
+                    <li><a href="#" class="nav-link" data-page="about">About</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                <button id="login-btn">Admin Login</button>
+                <button id="logout-btn" style="display: none;">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Welcome to University Bookstore</h1>
+            <p>Your one-stop destination for all academic textbooks and resources. Find, borrow, and return books with ease.</p>
+            <a href="#" class="btn nav-link" data-page="books">Browse Books</a>
+        </div>
+    </section>
+
+    <!-- Student ID Form -->
+    <section id="student-id-section" class="container">
+        <div class="student-id-form">
+            <h2>Borrow a Book</h2>
+            <p>Enter your student ID to borrow books from the library</p>
+            <form id="student-id-form">
+                <div class="form-group">
+                    <label for="student-id">Student ID</label>
+                    <input type="text" id="student-id" class="form-control" placeholder="Enter your student ID" required>
+                </div>
+                <button type="submit" class="submit-btn">Verify Student</button>
+            </form>
+            <div id="student-info" class="student-info">
+                <h3>Student Information</h3>
+                <p><strong>Name:</strong> <span id="student-name"></span></p>
+                <p><strong>ID:</strong> <span id="student-id-display"></span></p>
+                <p><strong>Course:</strong> <span id="student-course"></span></p>
+            </div>
+        </div>
+        
+        <div class="penalty-info">
+            <h3>Borrowing Policy</h3>
+            <p>Books can be borrowed for 14 days. A penalty of KSH 150 per day will be charged for late returns.</p>
+        </div>
+    </section>
+
+    <!-- Books Section -->
+    <section id="books-section" class="container">
+        <h2 class="section-title">Available Books</h2>
+        <div class="books-grid" id="books-container">
+            <!-- Books will be dynamically inserted here -->
+        </div>
+    </section>
+
+    <!-- Admin Panel -->
+    <section id="admin-panel" class="admin-panel container">
+        <div class="admin-nav">
+            <ul>
+                <li><a href="#" class="admin-nav-link active" data-section="books-management">Books Management</a></li>
+                <li><a href="#" class="admin-nav-link" data-section="users-tracking">Borrowing Tracking</a></li>
+            </ul>
+        </div>
+        
+        <!-- Books Management Section -->
+        <div id="books-management" class="admin-section active">
+            <h2 class="section-title">Books Management</h2>
+            
+            <div class="add-book-form">
+                <h3>Add New Book</h3>
+                <form id="add-book-form">
+                    <div class="form-group">
+                        <label for="book-title">Title</label>
+                        <input type="text" id="book-title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="book-author">Author</label>
+                        <input type="text" id="book-author" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="book-isbn">ISBN</label>
+                        <input type="text" id="book-isbn" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="book-category">Category</label>
+                        <input type="text" id="book-category" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="book-stock">Stock</label>
+                        <input type="number" id="book-stock" class="form-control" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Add Book</button>
+                </form>
+            </div>
+            
+            <h3>All Books</h3>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>Category</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-books-table">
+                    <!-- Books will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Users Tracking Section -->
+        <div id="users-tracking" class="admin-section">
+            <h2 class="section-title">Borrowing Tracking</h2>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Book Title</th>
+                        <th>Borrow Date</th>
+                        <th>Due Date</th>
+                        <th>Days Overdue</th>
+                        <th>Penalty (KSH)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="users-tracking-table">
+                    <!-- Users and borrowed books will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 University Bookstore. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Admin Login</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="login-form">
+                <div id="login-alert"></div>
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" class="form-control" required>
+                </div>
+                <button type="submit" class="submit-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data storage (simulating a database)
+        let students = JSON.parse(localStorage.getItem('students')) || [
+            { id: 'S001', name: 'John Mwangi', course: 'Computer Science' },
+            { id: 'S002', name: 'Mary Wanjiku', course: 'Business Administration' },
+            { id: 'S003', name: 'James Omondi', course: 'Engineering' },
+            { id: 'S004', name: 'Grace Achieng', course: 'Medicine' },
+            { id: 'S005', name: 'Peter Kamau', course: 'Law' },
+            { id: 'S006', name: 'Susan Adhiambo', course: 'Education' }
+        ];
+        
+        let books = JSON.parse(localStorage.getItem('books')) || [
+            { id: 1, title: 'Introduction to Computer Science', author: 'David Smith', isbn: '978-0123456789', category: 'Computer Science', stock: 5 },
+            { id: 2, title: 'Calculus: Early Transcendentals', author: 'James Stewart', isbn: '978-0538497909', category: 'Mathematics', stock: 3 },
+            { id: 3, title: 'Principles of Economics', author: 'N. Gregory Mankiw', isbn: '978-1305585126', category: 'Economics', stock: 7 },
+            { id: 4, title: 'Organic Chemistry', author: 'Paula Yurkanis Bruice', isbn: '978-0321971371', category: 'Chemistry', stock: 2 },
+            { id: 5, title: 'Fundamentals of Physics', author: 'David Halliday', isbn: '978-1118230718', category: 'Physics', stock: 4 },
+            { id: 6, title: 'Introduction to Psychology', author: 'James Kalat', isbn: '978-1305271555', category: 'Psychology', stock: 6 },
+            { id: 7, title: 'Human Anatomy & Physiology', author: 'Elaine Marieb', isbn: '978-0134580999', category: 'Biology', stock: 3 },
+            { id: 8, title: 'Business Statistics', author: 'Robert Donnelly', isbn: '978-0134685267', category: 'Business', stock: 5 },
+            { id: 9, title: 'Financial Accounting', author: 'Walter Harrison', isbn: '978-0134725987', category: 'Accounting', stock: 4 },
+            { id: 10, title: 'Marketing Management', author: 'Philip Kotler', isbn: '978-0133856460', category: 'Marketing', stock: 3 },
+            { id: 11, title: 'Operations Management', author: 'Jay Heizer', isbn: '978-0134130422', category: 'Management', stock: 2 },
+            { id: 12, title: 'Organizational Behavior', author: 'Stephen Robbins', isbn: '978-0134729329', category: 'Management', stock: 4 },
+            { id: 13, title: 'Civil Engineering Materials', author: 'Shan Somayaji', isbn: '978-0132805452', category: 'Engineering', stock: 3 },
+            { id: 14, title: 'Electrical Engineering', author: 'Allan Hambley', isbn: '978-0133116649', category: 'Engineering', stock: 2 },
+            { id: 15, title: 'Mechanical Engineering', author: 'Michael Lindeburg', isbn: '978-1591264151', category: 'Engineering', stock: 3 },
+            { id: 16, title: 'Constitutional Law', author: 'Erwin Chemerinsky', isbn: '978-1454892389', category: 'Law', stock: 4 },
+            { id: 17, title: 'Criminal Law', author: 'Joel Samaha', isbn: '978-1305577381', category: 'Law', stock: 2 },
+            { id: 18, title: 'Educational Psychology', author: 'Anita Woolfolk', isbn: '978-0134774329', category: 'Education', stock: 5 },
+            { id: 19, title: 'Curriculum Development', author: 'Allan Ornstein', isbn: '978-1133591485', category: 'Education', stock: 3 },
+            { id: 20, title: 'Medical-Surgical Nursing', author: 'Donna Ignatavicius', isbn: '978-0323444194', category: 'Medicine', stock: 2 }
+        ];
+        
+        let borrowedBooks = JSON.parse(localStorage.getItem('borrowedBooks')) || [];
+        
+        // Current user state
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        let currentStudent = JSON.parse(localStorage.getItem('currentStudent')) || null;
+        
+        // DOM Elements
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const loginModal = document.getElementById('login-modal');
+        const closeBtns = document.querySelectorAll('.close-btn');
+        const loginForm = document.getElementById('login-form');
+        const booksContainer = document.getElementById('books-container');
+        const adminBooksTable = document.getElementById('admin-books-table');
+        const usersTrackingTable = document.getElementById('users-tracking-table');
+        const addBookForm = document.getElementById('add-book-form');
+        const adminNavLinks = document.querySelectorAll('.admin-nav-link');
+        const adminSections = document.querySelectorAll('.admin-section');
+        const booksSection = document.getElementById('books-section');
+        const adminPanel = document.getElementById('admin-panel');
+        const studentIdForm = document.getElementById('student-id-form');
+        const studentInfoDiv = document.getElementById('student-info');
+        const studentNameSpan = document.getElementById('student-name');
+        const studentIdSpan = document.getElementById('student-id-display');
+        const studentCourseSpan = document.getElementById('student-course');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const studentIdSection = document.getElementById('student-id-section');
+        
+        // Initialize the application
+        function init() {
+            updateUI();
+            renderBooks();
+            renderAdminBooks();
+            renderUsersTracking();
+            
+            // Event Listeners
+            loginBtn.addEventListener('click', () => openModal(loginModal));
+            logoutBtn.addEventListener('click', logout);
+            
+            closeBtns.forEach(btn => {
+                btn.addEventListener('click', closeModals);
+            });
+            
+            loginForm.addEventListener('submit', handleLogin);
+            addBookForm.addEventListener('submit', handleAddBook);
+            studentIdForm.addEventListener('submit', handleStudentId);
+            
+            adminNavLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = link.getAttribute('data-section');
+                    switchAdminSection(section);
+                });
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = link.getAttribute('data-page');
+                    navigateToPage(page);
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === loginModal) closeModals();
+            });
+        }
+        
+        // Update UI based on authentication state
+        function updateUI() {
+            if (currentUser) {
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+                adminPanel.style.display = 'block';
+                booksSection.style.display = 'none';
+                studentIdSection.style.display = 'none';
+            } else {
+                loginBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+                adminPanel.style.display = 'none';
+                booksSection.style.display = 'block';
+                studentIdSection.style.display = 'block';
+            }
+        }
+        
+        // Modal functions
+        function openModal(modal) {
+            modal.style.display = 'flex';
+        }
+        
+        function closeModals() {
+            loginModal.style.display = 'none';
+            document.getElementById('login-alert').innerHTML = '';
+        }
+        
+        // Authentication functions
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (username === 'admin' && password === 'admin123') {
+                currentUser = { username: 'admin', role: 'admin' };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUI();
+                closeModals();
+                showAlert('login-alert', 'Login successful!', 'success');
+            } else {
+                showAlert('login-alert', 'Invalid username or password', 'error');
+            }
+        }
+        
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUI();
+            renderBooks();
+        }
+        
+        // Student ID verification
+        function handleStudentId(e) {
+            e.preventDefault();
+            const studentId = document.getElementById('student-id').value;
+            
+            const student = students.find(s => s.id === studentId);
+            
+            if (student) {
+                currentStudent = student;
+                localStorage.setItem('currentStudent', JSON.stringify(currentStudent));
+                
+                studentNameSpan.textContent = student.name;
+                studentIdSpan.textContent = student.id;
+                studentCourseSpan.textContent = student.course;
+                
+                studentInfoDiv.style.display = 'block';
+                renderBooks();
+                
+                alert(`Welcome ${student.name}! You can now borrow books.`);
+            } else {
+                alert('Student ID not found. Please check your ID and try again.');
+            }
+        }
+        
+        // Book functions
+        function renderBooks() {
+            booksContainer.innerHTML = '';
+            
+            books.forEach(book => {
+                const isBorrowed = borrowedBooks.some(bb => 
+                    bb.bookId === book.id && bb.studentId === (currentStudent ? currentStudent.id : null) && !bb.returned
+                );
+                
+                const bookCard = document.createElement('div');
+                bookCard.className = 'book-card';
+                bookCard.innerHTML = `
+                    <div class="book-image">Book Cover</div>
+                    <div class="book-details">
+                        <h3 class="book-title">${book.title}</h3>
+                        <p class="book-author">by ${book.author}</p>
+                        <p class="book-category">${book.category}</p>
+                        <button class="borrow-btn" data-id="${book.id}" ${!currentStudent || book.stock === 0 || isBorrowed ? 'disabled' : ''}>
+                            ${!currentStudent ? 'Enter Student ID to Borrow' : 
+                              book.stock === 0 ? 'Out of Stock' : 
+                              isBorrowed ? 'Already Borrowed' : 'Borrow Book'}
+                        </button>
+                    </div>
+                `;
+                
+                booksContainer.appendChild(bookCard);
+            });
+            
+            // Add event listeners to borrow buttons
+            document.querySelectorAll('.borrow-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (currentStudent) {
+                        const bookId = parseInt(e.target.getAttribute('data-id'));
+                        borrowBook(bookId);
+                    }
+                });
+            });
+        }
+        
+        function renderAdminBooks() {
+            adminBooksTable.innerHTML = '';
+            
+            books.forEach(book => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.isbn}</td>
+                    <td>${book.category}</td>
+                    <td>${book.stock}</td>
+                    <td>
+                        <button class="action-btn edit-btn" data-id="${book.id}">✏️</button>
+                        <button class="action-btn delete-btn" data-id="${book.id}">🗑️</button>
+                    </td>
+                `;
+                
+                adminBooksTable.appendChild(row);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const bookId = parseInt(e.target.getAttribute('data-id'));
+                    editBook(bookId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const bookId = parseInt(e.target.getAttribute('data-id'));
+                    deleteBook(bookId);
+                });
+            });
+        }
+        
+        function renderUsersTracking() {
+            usersTrackingTable.innerHTML = '';
+            
+            borrowedBooks.forEach(borrowed => {
+                if (borrowed.returned) return;
+                
+                const student = students.find(s => s.id === borrowed.studentId);
+                const book = books.find(b => b.id === borrowed.bookId);
+                
+                if (student && book) {
+                    const dueDate = new Date(borrowed.dueDate);
+                    const today = new Date();
+                    const daysOverdue = Math.max(0, Math.floor((today - dueDate) / (1000 * 60 * 60 * 24)));
+                    const penalty = daysOverdue * 150;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${student.id}</td>
+                        <td>${student.name}</td>
+                        <td>${book.title}</td>
+                        <td>${new Date(borrowed.borrowDate).toLocaleDateString()}</td>
+                        <td>${dueDate.toLocaleDateString()}</td>
+                        <td>${daysOverdue}</td>
+                        <td>${penalty}</td>
+                        <td>
+                            <button class="action-btn" data-id="${borrowed.id}">Mark Returned</button>
+                        </td>
+                    `;
+                    
+                    usersTrackingTable.appendChild(row);
+                }
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('#users-tracking-table .action-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const borrowId = parseInt(e.target.getAttribute('data-id'));
+                    markBookReturned(borrowId);
+                });
+            });
+        }
+        
+        function borrowBook(bookId) {
+            const book = books.find(b => b.id === bookId);
+            
+            if (!book || book.stock === 0) {
+                alert('This book is currently out of stock.');
+                return;
+            }
+            
+            // Calculate due date (14 days from now)
+            const borrowDate = new Date();
+            const dueDate = new Date();
+            dueDate.setDate(borrowDate.getDate() + 14);
+            
+            const borrowedBook = {
+                id: borrowedBooks.length > 0 ? Math.max(...borrowedBooks.map(bb => bb.id)) + 1 : 1,
+                bookId,
+                studentId: currentStudent.id,
+                borrowDate: borrowDate.toISOString(),
+                dueDate: dueDate.toISOString(),
+                returned: false
+            };
+            
+            borrowedBooks.push(borrowedBook);
+            book.stock--;
+            
+            localStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+            localStorage.setItem('books', JSON.stringify(books));
+            
+            renderBooks();
+            
+            alert(`You have successfully borrowed "${book.title}". Please return it by ${dueDate.toLocaleDateString()}.`);
+        }
+        
+        function markBookReturned(borrowId) {
+            const borrowed = borrowedBooks.find(bb => bb.id === borrowId);
+            
+            if (!borrowed) return;
+            
+            borrowed.returned = true;
+            borrowed.returnDate = new Date().toISOString();
+            
+            const book = books.find(b => b.id === borrowed.bookId);
+            if (book) {
+                book.stock++;
+            }
+            
+            localStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+            localStorage.setItem('books', JSON.stringify(books));
+            
+            renderUsersTracking();
+            renderAdminBooks();
+            
+            alert(`Book has been marked as returned.`);
+        }
+        
+        function handleAddBook(e) {
+            e.preventDefault();
+            
+            const newBook = {
+                id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
+                title: document.getElementById('book-title').value,
+                author: document.getElementById('book-author').value,
+                isbn: document.getElementById('book-isbn').value,
+                category: document.getElementById('book-category').value,
+                stock: parseInt(document.getElementById('book-stock').value)
+            };
+            
+            books.push(newBook);
+            localStorage.setItem('books', JSON.stringify(books));
+            
+            addBookForm.reset();
+            renderAdminBooks();
+            renderBooks();
+            
+            alert('Book added successfully!');
+        }
+        
+        function editBook(bookId) {
+            // In a real application, this would open an edit form
+            alert('Edit functionality would be implemented here. Book ID: ' + bookId);
+        }
+        
+        function deleteBook(bookId) {
+            if (confirm('Are you sure you want to delete this book?')) {
+                books = books.filter(b => b.id !== bookId);
+                localStorage.setItem('books', JSON.stringify(books));
+                renderAdminBooks();
+                renderBooks();
+                alert('Book deleted successfully!');
+            }
+        }
+        
+        // Helper functions
+        function showAlert(containerId, message, type) {
+            const alertContainer = document.getElementById(containerId);
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type}">${message}</div>
+            `;
+        }
+        
+        function switchAdminSection(section) {
+            // Update active nav link
+            adminNavLinks.forEach(link => {
+                if (link.getAttribute('data-section') === section) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+            
+            // Show active section
+            adminSections.forEach(sec => {
+                if (sec.id === section) {
+                    sec.classList.add('active');
+                } else {
+                    sec.classList.remove('active');
+                }
+            });
+        }
+        
+        function navigateToPage(page) {
+            // In a real application, this would handle page navigation
+            // For this demo, we'll just scroll to the appropriate section
+            if (page === 'home') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (page === 'books') {
+                document.getElementById('books-section').scrollIntoView({ behavior: 'smooth' });
+            }
+            // Other pages would be handled similarly
+        }
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
