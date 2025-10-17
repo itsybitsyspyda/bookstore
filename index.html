@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>University Bookstore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #2c3e50;
@@ -131,6 +132,72 @@
             color: var(--dark);
         }
         
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .course-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .course-image {
+            height: 160px;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            position: relative;
+        }
+        
+        .course-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+        }
+        
+        .course-image span {
+            z-index: 1;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+        }
+        
+        .course-details {
+            padding: 1.5rem;
+        }
+        
+        .course-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .course-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        
         .books-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -151,14 +218,14 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
         
-        .book-image {
-            height: 200px;
-            background-color: #ddd;
+        .book-icon {
+            height: 120px;
+            background-color: var(--secondary);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #777;
-            font-weight: bold;
+            color: white;
+            font-size: 3rem;
         }
         
         .book-details {
@@ -431,6 +498,16 @@
             margin: 1rem 0;
         }
         
+        /* Verification Required Message */
+        .verification-required {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
         /* Responsive Styles */
         @media (max-width: 768px) {
             .header-content {
@@ -447,7 +524,7 @@
                 margin-top: 1rem;
             }
             
-            .books-grid {
+            .books-grid, .courses-grid {
                 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             }
             
@@ -470,6 +547,7 @@
             <nav>
                 <ul>
                     <li><a href="#" class="nav-link" data-page="home">Home</a></li>
+                    <li><a href="#" class="nav-link" data-page="courses">Courses</a></li>
                     <li><a href="#" class="nav-link" data-page="books">Books</a></li>
                     <li><a href="#" class="nav-link" data-page="about">About</a></li>
                 </ul>
@@ -486,15 +564,15 @@
         <div class="container">
             <h1>Welcome to University Bookstore</h1>
             <p>Your one-stop destination for all academic textbooks and resources. Find, borrow, and return books with ease.</p>
-            <a href="#" class="btn nav-link" data-page="books">Browse Books</a>
+            <a href="#" class="btn nav-link" data-page="courses">Browse Courses</a>
         </div>
     </section>
 
     <!-- Student ID Form -->
     <section id="student-id-section" class="container">
         <div class="student-id-form">
-            <h2>Borrow a Book</h2>
-            <p>Enter your student ID to borrow books from the library</p>
+            <h2>Student Verification</h2>
+            <p>Enter your student ID to verify your identity and borrow books</p>
             <form id="student-id-form">
                 <div class="form-group">
                     <label for="student-id">Student ID</label>
@@ -514,11 +592,24 @@
             <h3>Borrowing Policy</h3>
             <p>Books can be borrowed for 14 days. A penalty of KSH 150 per day will be charged for late returns.</p>
         </div>
+        
+        <div id="verification-required" class="verification-required">
+            <h3>⚠️ Verification Required</h3>
+            <p>You must verify your student identity before you can borrow books. Please enter your Student ID above.</p>
+        </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section id="courses-section" class="container">
+        <h2 class="section-title">Available Courses</h2>
+        <div class="courses-grid" id="courses-container">
+            <!-- Courses will be dynamically inserted here -->
+        </div>
     </section>
 
     <!-- Books Section -->
     <section id="books-section" class="container">
-        <h2 class="section-title">Available Books</h2>
+        <h2 class="section-title" id="books-section-title">Available Books</h2>
         <div class="books-grid" id="books-container">
             <!-- Books will be dynamically inserted here -->
         </div>
@@ -645,28 +736,72 @@
             { id: 'S006', name: 'Susan Adhiambo', course: 'Education' }
         ];
         
-        let books = JSON.parse(localStorage.getItem('books')) || [
-            { id: 1, title: 'Introduction to Computer Science', author: 'David Smith', isbn: '978-0123456789', category: 'Computer Science', stock: 5 },
-            { id: 2, title: 'Calculus: Early Transcendentals', author: 'James Stewart', isbn: '978-0538497909', category: 'Mathematics', stock: 3 },
-            { id: 3, title: 'Principles of Economics', author: 'N. Gregory Mankiw', isbn: '978-1305585126', category: 'Economics', stock: 7 },
-            { id: 4, title: 'Organic Chemistry', author: 'Paula Yurkanis Bruice', isbn: '978-0321971371', category: 'Chemistry', stock: 2 },
-            { id: 5, title: 'Fundamentals of Physics', author: 'David Halliday', isbn: '978-1118230718', category: 'Physics', stock: 4 },
-            { id: 6, title: 'Introduction to Psychology', author: 'James Kalat', isbn: '978-1305271555', category: 'Psychology', stock: 6 },
-            { id: 7, title: 'Human Anatomy & Physiology', author: 'Elaine Marieb', isbn: '978-0134580999', category: 'Biology', stock: 3 },
-            { id: 8, title: 'Business Statistics', author: 'Robert Donnelly', isbn: '978-0134685267', category: 'Business', stock: 5 },
-            { id: 9, title: 'Financial Accounting', author: 'Walter Harrison', isbn: '978-0134725987', category: 'Accounting', stock: 4 },
-            { id: 10, title: 'Marketing Management', author: 'Philip Kotler', isbn: '978-0133856460', category: 'Marketing', stock: 3 },
-            { id: 11, title: 'Operations Management', author: 'Jay Heizer', isbn: '978-0134130422', category: 'Management', stock: 2 },
-            { id: 12, title: 'Organizational Behavior', author: 'Stephen Robbins', isbn: '978-0134729329', category: 'Management', stock: 4 },
-            { id: 13, title: 'Civil Engineering Materials', author: 'Shan Somayaji', isbn: '978-0132805452', category: 'Engineering', stock: 3 },
-            { id: 14, title: 'Electrical Engineering', author: 'Allan Hambley', isbn: '978-0133116649', category: 'Engineering', stock: 2 },
-            { id: 15, title: 'Mechanical Engineering', author: 'Michael Lindeburg', isbn: '978-1591264151', category: 'Engineering', stock: 3 },
-            { id: 16, title: 'Constitutional Law', author: 'Erwin Chemerinsky', isbn: '978-1454892389', category: 'Law', stock: 4 },
-            { id: 17, title: 'Criminal Law', author: 'Joel Samaha', isbn: '978-1305577381', category: 'Law', stock: 2 },
-            { id: 18, title: 'Educational Psychology', author: 'Anita Woolfolk', isbn: '978-0134774329', category: 'Education', stock: 5 },
-            { id: 19, title: 'Curriculum Development', author: 'Allan Ornstein', isbn: '978-1133591485', category: 'Education', stock: 3 },
-            { id: 20, title: 'Medical-Surgical Nursing', author: 'Donna Ignatavicius', isbn: '978-0323444194', category: 'Medicine', stock: 2 }
+        let courses = [
+            { id: 1, name: 'Computer Science', books: 7, color: '#3498db', image: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80' },
+            { id: 2, name: 'Business Administration', books: 7, color: '#2ecc71', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80' },
+            { id: 3, name: 'Engineering', books: 7, color: '#e74c3c', image: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870'},
+            { id: 4, name: 'Medicine', books: 7, color: '#9b59b6', image: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80' },
+            { id: 5, name: 'Law', books: 7, color: '#f39c12', image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80' },
+            { id: 6, name: 'Education', books: 7, color: '#1abc9c', image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2022&q=80' }
         ];
+        
+        // Course-specific books (7 books per course)
+        let courseBooks = {
+            'Computer Science': [
+                { id: 1, title: 'Introduction to Computer Science', author: 'David Smith', isbn: '978-0123456789', category: 'Computer Science', stock: 5 },
+                { id: 2, title: 'Data Structures and Algorithms', author: 'Michael Johnson', isbn: '978-0123456790', category: 'Computer Science', stock: 3 },
+                { id: 3, title: 'Database Systems', author: 'Sarah Williams', isbn: '978-0123456791', category: 'Computer Science', stock: 4 },
+                { id: 4, title: 'Operating Systems', author: 'Robert Brown', isbn: '978-0123456792', category: 'Computer Science', stock: 2 },
+                { id: 5, title: 'Computer Networks', author: 'Jennifer Davis', isbn: '978-0123456793', category: 'Computer Science', stock: 6 },
+                { id: 6, title: 'Software Engineering', author: 'Thomas Miller', isbn: '978-0123456794', category: 'Computer Science', stock: 3 },
+                { id: 7, title: 'Artificial Intelligence', author: 'Lisa Wilson', isbn: '978-0123456795', category: 'Computer Science', stock: 4 }
+            ],
+            'Business Administration': [
+                { id: 8, title: 'Principles of Management', author: 'James Anderson', isbn: '978-0123456796', category: 'Business', stock: 5 },
+                { id: 9, title: 'Financial Accounting', author: 'Walter Harrison', isbn: '978-0134725987', category: 'Business', stock: 4 },
+                { id: 10, title: 'Marketing Management', author: 'Philip Kotler', isbn: '978-0133856460', category: 'Business', stock: 3 },
+                { id: 11, title: 'Business Statistics', author: 'Robert Donnelly', isbn: '978-0134685267', category: 'Business', stock: 5 },
+                { id: 12, title: 'Organizational Behavior', author: 'Stephen Robbins', isbn: '978-0134729329', category: 'Business', stock: 4 },
+                { id: 13, title: 'Strategic Management', author: 'Fred David', isbn: '978-0133456797', category: 'Business', stock: 3 },
+                { id: 14, title: 'Business Ethics', author: 'Laura Thompson', isbn: '978-0133456798', category: 'Business', stock: 2 }
+            ],
+            'Engineering': [
+                { id: 15, title: 'Civil Engineering Materials', author: 'Shan Somayaji', isbn: '978-0132805452', category: 'Engineering', stock: 3 },
+                { id: 16, title: 'Electrical Engineering', author: 'Allan Hambley', isbn: '978-0133116649', category: 'Engineering', stock: 2 },
+                { id: 17, title: 'Mechanical Engineering', author: 'Michael Lindeburg', isbn: '978-1591264151', category: 'Engineering', stock: 3 },
+                { id: 18, title: 'Engineering Mathematics', author: 'K.A. Stroud', isbn: '978-0133456799', category: 'Engineering', stock: 4 },
+                { id: 19, title: 'Thermodynamics', author: 'Yunus Cengel', isbn: '978-0133456800', category: 'Engineering', stock: 3 },
+                { id: 20, title: 'Fluid Mechanics', author: 'Frank White', isbn: '978-0133456801', category: 'Engineering', stock: 2 },
+                { id: 21, title: 'Structural Analysis', author: 'R.C. Hibbeler', isbn: '978-0133456802', category: 'Engineering', stock: 4 }
+            ],
+            'Medicine': [
+                { id: 22, title: 'Human Anatomy & Physiology', author: 'Elaine Marieb', isbn: '978-0134580999', category: 'Medicine', stock: 3 },
+                { id: 23, title: 'Medical-Surgical Nursing', author: 'Donna Ignatavicius', isbn: '978-0323444194', category: 'Medicine', stock: 2 },
+                { id: 24, title: 'Pharmacology', author: 'Karen Whalen', isbn: '978-0133456803', category: 'Medicine', stock: 4 },
+                { id: 25, title: 'Pathophysiology', author: 'Carol Porth', isbn: '978-0133456804', category: 'Medicine', stock: 3 },
+                { id: 26, title: 'Clinical Medicine', author: 'Parveen Kumar', isbn: '978-0133456805', category: 'Medicine', stock: 2 },
+                { id: 27, title: 'Microbiology', author: 'Gerard Tortora', isbn: '978-0133456806', category: 'Medicine', stock: 5 },
+                { id: 28, title: 'Biochemistry', author: 'Jeremy Berg', isbn: '978-0133456807', category: 'Medicine', stock: 3 }
+            ],
+            'Law': [
+                { id: 29, title: 'Constitutional Law', author: 'Erwin Chemerinsky', isbn: '978-1454892389', category: 'Law', stock: 4 },
+                { id: 30, title: 'Criminal Law', author: 'Joel Samaha', isbn: '978-1305577381', category: 'Law', stock: 2 },
+                { id: 31, title: 'Contract Law', author: 'Ewan McKendrick', isbn: '978-0133456808', category: 'Law', stock: 3 },
+                { id: 32, title: 'Tort Law', author: 'Emily Finch', isbn: '978-0133456809', category: 'Law', stock: 4 },
+                { id: 33, title: 'Property Law', author: 'Roger Smith', isbn: '978-0133456810', category: 'Law', stock: 2 },
+                { id: 34, title: 'Legal Research', author: 'Amy Sloan', isbn: '978-0133456811', category: 'Law', stock: 5 },
+                { id: 35, title: 'International Law', author: 'Malcolm Shaw', isbn: '978-0133456812', category: 'Law', stock: 3 }
+            ],
+            'Education': [
+                { id: 36, title: 'Educational Psychology', author: 'Anita Woolfolk', isbn: '978-0134774329', category: 'Education', stock: 5 },
+                { id: 37, title: 'Curriculum Development', author: 'Allan Ornstein', isbn: '978-1133591485', category: 'Education', stock: 3 },
+                { id: 38, title: 'Teaching Methods', author: 'Bruce Joyce', isbn: '978-0133456813', category: 'Education', stock: 4 },
+                { id: 39, title: 'Classroom Management', author: 'Carolyn Evertson', isbn: '978-0133456814', category: 'Education', stock: 3 },
+                { id: 40, title: 'Educational Assessment', author: 'James Popham', isbn: '978-0133456815', category: 'Education', stock: 2 },
+                { id: 41, title: 'Special Education', author: 'Marilyn Friend', isbn: '978-0133456816', category: 'Education', stock: 4 },
+                { id: 42, title: 'Educational Technology', author: 'Al Januszewski', isbn: '978-0133456817', category: 'Education', stock: 3 }
+            ]
+        };
         
         let borrowedBooks = JSON.parse(localStorage.getItem('borrowedBooks')) || [];
         
@@ -681,12 +816,14 @@
         const closeBtns = document.querySelectorAll('.close-btn');
         const loginForm = document.getElementById('login-form');
         const booksContainer = document.getElementById('books-container');
+        const coursesContainer = document.getElementById('courses-container');
         const adminBooksTable = document.getElementById('admin-books-table');
         const usersTrackingTable = document.getElementById('users-tracking-table');
         const addBookForm = document.getElementById('add-book-form');
         const adminNavLinks = document.querySelectorAll('.admin-nav-link');
         const adminSections = document.querySelectorAll('.admin-section');
         const booksSection = document.getElementById('books-section');
+        const coursesSection = document.getElementById('courses-section');
         const adminPanel = document.getElementById('admin-panel');
         const studentIdForm = document.getElementById('student-id-form');
         const studentInfoDiv = document.getElementById('student-info');
@@ -695,10 +832,13 @@
         const studentCourseSpan = document.getElementById('student-course');
         const navLinks = document.querySelectorAll('.nav-link');
         const studentIdSection = document.getElementById('student-id-section');
+        const booksSectionTitle = document.getElementById('books-section-title');
+        const verificationRequiredDiv = document.getElementById('verification-required');
         
         // Initialize the application
         function init() {
             updateUI();
+            renderCourses();
             renderBooks();
             renderAdminBooks();
             renderUsersTracking();
@@ -744,13 +884,22 @@
                 logoutBtn.style.display = 'block';
                 adminPanel.style.display = 'block';
                 booksSection.style.display = 'none';
+                coursesSection.style.display = 'none';
                 studentIdSection.style.display = 'none';
             } else {
                 loginBtn.style.display = 'block';
                 logoutBtn.style.display = 'none';
                 adminPanel.style.display = 'none';
                 booksSection.style.display = 'block';
+                coursesSection.style.display = 'block';
                 studentIdSection.style.display = 'block';
+                
+                // Show/hide verification message
+                if (currentStudent) {
+                    verificationRequiredDiv.style.display = 'none';
+                } else {
+                    verificationRequiredDiv.style.display = 'block';
+                }
             }
         }
         
@@ -804,19 +953,58 @@
                 studentCourseSpan.textContent = student.course;
                 
                 studentInfoDiv.style.display = 'block';
+                verificationRequiredDiv.style.display = 'none';
                 renderBooks();
                 
-                alert(`Welcome ${student.name}! You can now borrow books.`);
+                alert(`Welcome ${student.name}! You are now verified and can borrow books.`);
             } else {
                 alert('Student ID not found. Please check your ID and try again.');
             }
+        }
+        
+        // Course functions
+        function renderCourses() {
+            coursesContainer.innerHTML = '';
+            
+            courses.forEach(course => {
+                const courseCard = document.createElement('div');
+                courseCard.className = 'course-card';
+                courseCard.innerHTML = `
+                    <div class="course-image" style="background-image: url('${course.image}')">
+                        <span>${course.name}</span>
+                    </div>
+                    <div class="course-details">
+                        <h3 class="course-title">${course.name}</h3>
+                        <div class="course-stats">
+                            <span><i class="fas fa-book"></i> ${course.books} Books</span>
+                            <span><i class="fas fa-users"></i> ${Math.floor(Math.random() * 50) + 20} Students</span>
+                        </div>
+                    </div>
+                `;
+                
+                coursesContainer.appendChild(courseCard);
+            });
         }
         
         // Book functions
         function renderBooks() {
             booksContainer.innerHTML = '';
             
-            books.forEach(book => {
+            let booksToShow = [];
+            
+            if (currentStudent) {
+                // Show course-specific books for the student
+                booksToShow = courseBooks[currentStudent.course] || [];
+                booksSectionTitle.textContent = `Available Books for ${currentStudent.course}`;
+            } else {
+                // Show all books if no student is logged in
+                Object.values(courseBooks).forEach(bookList => {
+                    booksToShow = booksToShow.concat(bookList);
+                });
+                booksSectionTitle.textContent = 'Available Books (Verify to Borrow)';
+            }
+            
+            booksToShow.forEach(book => {
                 const isBorrowed = borrowedBooks.some(bb => 
                     bb.bookId === book.id && bb.studentId === (currentStudent ? currentStudent.id : null) && !bb.returned
                 );
@@ -824,13 +1012,17 @@
                 const bookCard = document.createElement('div');
                 bookCard.className = 'book-card';
                 bookCard.innerHTML = `
-                    <div class="book-image">Book Cover</div>
+                    <div class="book-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
                     <div class="book-details">
                         <h3 class="book-title">${book.title}</h3>
                         <p class="book-author">by ${book.author}</p>
                         <p class="book-category">${book.category}</p>
+                        <p><strong>ISBN:</strong> ${book.isbn}</p>
+                        <p><strong>Available:</strong> ${book.stock} copies</p>
                         <button class="borrow-btn" data-id="${book.id}" ${!currentStudent || book.stock === 0 || isBorrowed ? 'disabled' : ''}>
-                            ${!currentStudent ? 'Enter Student ID to Borrow' : 
+                            ${!currentStudent ? 'Verify to Borrow' : 
                               book.stock === 0 ? 'Out of Stock' : 
                               isBorrowed ? 'Already Borrowed' : 'Borrow Book'}
                         </button>
@@ -843,10 +1035,14 @@
             // Add event listeners to borrow buttons
             document.querySelectorAll('.borrow-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    if (currentStudent) {
-                        const bookId = parseInt(e.target.getAttribute('data-id'));
-                        borrowBook(bookId);
+                    if (!currentStudent) {
+                        alert('Please verify your student identity first before borrowing books.');
+                        document.getElementById('student-id-section').scrollIntoView({ behavior: 'smooth' });
+                        return;
                     }
+                    
+                    const bookId = parseInt(e.target.getAttribute('data-id'));
+                    borrowBook(bookId);
                 });
             });
         }
@@ -854,7 +1050,13 @@
         function renderAdminBooks() {
             adminBooksTable.innerHTML = '';
             
-            books.forEach(book => {
+            // Combine all books for admin view
+            let allBooks = [];
+            Object.values(courseBooks).forEach(bookList => {
+                allBooks = allBooks.concat(bookList);
+            });
+            
+            allBooks.forEach(book => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${book.title}</td>
@@ -894,7 +1096,13 @@
                 if (borrowed.returned) return;
                 
                 const student = students.find(s => s.id === borrowed.studentId);
-                const book = books.find(b => b.id === borrowed.bookId);
+                
+                // Find the book in any course
+                let book = null;
+                Object.values(courseBooks).forEach(bookList => {
+                    const foundBook = bookList.find(b => b.id === borrowed.bookId);
+                    if (foundBook) book = foundBook;
+                });
                 
                 if (student && book) {
                     const dueDate = new Date(borrowed.dueDate);
@@ -930,7 +1138,12 @@
         }
         
         function borrowBook(bookId) {
-            const book = books.find(b => b.id === bookId);
+            // Find the book in any course
+            let book = null;
+            Object.values(courseBooks).forEach(bookList => {
+                const foundBook = bookList.find(b => b.id === bookId);
+                if (foundBook) book = foundBook;
+            });
             
             if (!book || book.stock === 0) {
                 alert('This book is currently out of stock.');
@@ -955,7 +1168,6 @@
             book.stock--;
             
             localStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
-            localStorage.setItem('books', JSON.stringify(books));
             
             renderBooks();
             
@@ -970,13 +1182,15 @@
             borrowed.returned = true;
             borrowed.returnDate = new Date().toISOString();
             
-            const book = books.find(b => b.id === borrowed.bookId);
-            if (book) {
-                book.stock++;
-            }
+            // Find the book in any course and increase stock
+            Object.values(courseBooks).forEach(bookList => {
+                const book = bookList.find(b => b.id === borrowed.bookId);
+                if (book) {
+                    book.stock++;
+                }
+            });
             
             localStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
-            localStorage.setItem('books', JSON.stringify(books));
             
             renderUsersTracking();
             renderAdminBooks();
@@ -988,7 +1202,9 @@
             e.preventDefault();
             
             const newBook = {
-                id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
+                id: Object.values(courseBooks).reduce((maxId, bookList) => {
+                    return Math.max(maxId, ...bookList.map(b => b.id));
+                }, 0) + 1,
                 title: document.getElementById('book-title').value,
                 author: document.getElementById('book-author').value,
                 isbn: document.getElementById('book-isbn').value,
@@ -996,8 +1212,11 @@
                 stock: parseInt(document.getElementById('book-stock').value)
             };
             
-            books.push(newBook);
-            localStorage.setItem('books', JSON.stringify(books));
+            // Add to appropriate course or create new category
+            if (!courseBooks[newBook.category]) {
+                courseBooks[newBook.category] = [];
+            }
+            courseBooks[newBook.category].push(newBook);
             
             addBookForm.reset();
             renderAdminBooks();
@@ -1007,14 +1226,16 @@
         }
         
         function editBook(bookId) {
-            // In a real application, this would open an edit form
             alert('Edit functionality would be implemented here. Book ID: ' + bookId);
         }
         
         function deleteBook(bookId) {
             if (confirm('Are you sure you want to delete this book?')) {
-                books = books.filter(b => b.id !== bookId);
-                localStorage.setItem('books', JSON.stringify(books));
+                // Remove book from all courses
+                Object.keys(courseBooks).forEach(course => {
+                    courseBooks[course] = courseBooks[course].filter(b => b.id !== bookId);
+                });
+                
                 renderAdminBooks();
                 renderBooks();
                 alert('Book deleted successfully!');
@@ -1050,19 +1271,17 @@
         }
         
         function navigateToPage(page) {
-            // In a real application, this would handle page navigation
-            // For this demo, we'll just scroll to the appropriate section
             if (page === 'home') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (page === 'courses') {
+                document.getElementById('courses-section').scrollIntoView({ behavior: 'smooth' });
             } else if (page === 'books') {
                 document.getElementById('books-section').scrollIntoView({ behavior: 'smooth' });
             }
-            // Other pages would be handled similarly
         }
         
         // Initialize the application
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
-
 </html>
